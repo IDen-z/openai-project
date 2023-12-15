@@ -1,5 +1,6 @@
 package com.zmz.chatgpt.interfaces;
 
+import com.zmz.chatgpt.application.IWeiXinValidateService;
 import com.zmz.chatgpt.session.Configuration;
 import com.zmz.chatgpt.session.OpenAiSession;
 import com.zmz.chatgpt.session.OpenAiSessionFactory;
@@ -12,11 +13,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
+
 @Slf4j
 @RestController
 public class WeiXinPortalController {
 
     private OpenAiSession openAiSession;
+
+    @Resource
+    private IWeiXinValidateService weiXinValidateService;
 
     public WeiXinPortalController() {
         // 1. 配置文件
