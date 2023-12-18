@@ -110,6 +110,12 @@
             <groupId>com.zmz</groupId>
             <artifactId>chatgpt-sdk</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- 230506-xfg-wx-sdk 分支，对接微信公众号，需要解析xml -->
