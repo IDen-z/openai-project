@@ -114,7 +114,6 @@ public class WeiXinPortalController {
             res.setMsgType("text");
             res.setContent(chatGPTMap.get(message.getContent().trim()));
             String result = XmlUtil.beanToXml(res);
-            // TODO 微信公众号未换行
             log.info("接收微信公众号信息请求{}完成 {}", openid, result);
             chatGPTMap.remove(message.getContent().trim());
             return result;
@@ -160,7 +159,9 @@ public class WeiXinPortalController {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            chatGPTMap.put(content, chatCompletionSyncResponse.getData().getChoices().get(0).getContent());
+            String resContent = chatCompletionSyncResponse.getData().getChoices().get(0).getContent();
+            // 去除前后的引号以及空格 以及处理换行符
+            chatGPTMap.put(content, resContent.substring(1, resContent.length() - 1).replaceAll("\\\\n", System.lineSeparator()).trim());
         });
     }
 
