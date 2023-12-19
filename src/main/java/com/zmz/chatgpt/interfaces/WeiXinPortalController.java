@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -123,6 +124,49 @@ public class WeiXinPortalController {
         }
     }
 
+    /**
+     * 发起同步请求
+     */
+    public void doChatGPTTaskSync(String content) {
+        chatGPTMap.put(content, "NULL");
+        taskExecutor.execute(() -> {
+            // OpenAI 请求
+            // 1. 创建参数
+            ChatCompletionRequest chatCompletion = ChatCompletionRequest
+                    .builder()
+                    .model(Model.CHATGLM_TURBO)
+                    .prompt(new ArrayList<ChatCompletionRequest.Prompt>() {
+                        private static final long serialVersionUID = -7988151926241837899L;
+
+                        {
+                            add(ChatCompletionRequest.Prompt.builder()
+                                    .role(Role.user.getCode())
+                                    .content(content)
+                                    .build());
+                        }
+                    })
+                    .build();
+            // 2. 发起请求
+            String response;
+            CompletableFuture<String> res;
+            try {
+                res = openAiSession.completions(chatCompletion);
+                response = res.get();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            // 去除前后的引号以及空格 以及处理换行符
+            chatGPTMap.put(content, response.substring(1, response.length() - 1).replaceAll("\\\\n", System.lineSeparator()).trim());
+        });
+    }
+
+
+    /**
+     * 发起异步请求
+     */
+    /**
+     * 发起同步请求
+     */
     public void doChatGPTTask(String content) {
         chatGPTMap.put(content, "NULL");
         taskExecutor.execute(() -> {
@@ -144,15 +188,6 @@ public class WeiXinPortalController {
                     .build();
             // 2. 发起请求
             String response;
-//            try {
-//                // 3. 解析结果
-//                CompletableFuture<String> future = openAiSession.completions(chatCompletion);
-//                response = future.get();
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            } catch (ExecutionException e) {
-//                throw new RuntimeException(e);
-//            }
             ChatCompletionSyncResponse chatCompletionSyncResponse;
             try {
                 chatCompletionSyncResponse = openAiSession.completionsSync(chatCompletion);
